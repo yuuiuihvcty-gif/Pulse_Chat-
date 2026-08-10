@@ -19,7 +19,15 @@ function unwrap<T>(res: { data: T | null; error: { message: string } | null }): 
 
 /* ---------------- profiles & settings ---------------- */
 
+export async function getProfilesByIds(ids: string[]): Promise<Profile[]> {
+  const unique = [...new Set(ids)];
+  if (unique.length === 0) return [];
+  return (unwrap(await supabase.from("profiles").select(PROFILE_COLS).in("id", unique)) ??
+    []) as Profile[];
+}
+
 export async function getProfile(id: string) {
+
   return unwrap(
     await supabase.from("profiles").select(PROFILE_COLS).eq("id", id).maybeSingle(),
   ) as Profile | null;
