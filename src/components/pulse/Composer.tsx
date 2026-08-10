@@ -101,7 +101,10 @@ export function Composer({
         if (cancelled.current || secs < 1) return;
         const blob = new Blob(chunks.current, { type: rec.mimeType || "audio/webm" });
         const err = validateFile(blob, "Voice message");
-        if (err) return toast.error(err);
+        if (err) {
+          toast.error(err);
+          return;
+        }
         onSendAttachment({ file: blob, filename: "voice.webm", kind: "voice", seconds: secs });
       };
       rec.start();
@@ -131,7 +134,10 @@ export function Composer({
     const file = files?.[0];
     if (!file) return;
     const err = validateFile(file, file.name);
-    if (err) return toast.error(err);
+    if (err) {
+      toast.error(err);
+      return;
+    }
     const kind: OutgoingAttachment["kind"] =
       forceKind ??
       (file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "file");
