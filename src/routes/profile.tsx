@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/pulse/Navigation";
+import { BottomNav, SideRail } from "@/components/pulse/Navigation";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -17,11 +17,13 @@ export const Route = createFileRoute("/profile")({
 
 function Page() {
   return (
-    <AppShell>
+    <div className="min-h-screen bg-background sm:flex">
+      <SideRail />
       <div className="px-4 py-6">
         <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
         <p className="mt-2 text-sm text-muted-foreground">Coming up next in this build.</p>
       </div>
-    </AppShell>
+      <BottomNav />
+    </div>
   );
 }
