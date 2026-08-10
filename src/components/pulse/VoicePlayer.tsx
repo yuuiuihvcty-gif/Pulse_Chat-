@@ -20,9 +20,10 @@ export function VoicePlayer({
   outgoing,
 }: {
   path: string;
-  seconds?: number;
-  outgoing?: boolean;
+  seconds?: number | undefined;
+  outgoing?: boolean | undefined;
 }) {
+
   const { url } = useSignedUrl(path);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
