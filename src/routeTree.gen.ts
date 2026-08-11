@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CallsRouteImport } from './routes/calls'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -19,6 +20,11 @@ import { Route as UpdatesRouteImport } from './routes/updates'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CallsRoute = CallsRouteImport.update({
@@ -49,6 +55,7 @@ const UpdatesRoute = UpdatesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/calls': typeof CallsRoute
   '/chats': typeof ChatsRoute
   '/contacts': typeof ContactsRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/calls': typeof CallsRoute
   '/chats': typeof ChatsRoute
   '/contacts': typeof ContactsRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/calls': typeof CallsRoute
   '/chats': typeof ChatsRoute
   '/contacts': typeof ContactsRoute
@@ -74,12 +83,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calls' | '/chats' | '/contacts' | '/profile' | '/updates'
+  fullPaths:
+    '/' | '/auth' | '/calls' | '/chats' | '/contacts' | '/profile' | '/updates'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calls' | '/chats' | '/contacts' | '/profile' | '/updates'
+  to:
+    '/' | '/auth' | '/calls' | '/chats' | '/contacts' | '/profile' | '/updates'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/calls'
     | '/chats'
     | '/contacts'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   CallsRoute: typeof CallsRoute
   ChatsRoute: typeof ChatsRoute
   ContactsRoute: typeof ContactsRoute
@@ -103,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calls': {
@@ -145,6 +165,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   CallsRoute: CallsRoute,
   ChatsRoute: ChatsRoute,
   ContactsRoute: ContactsRoute,
