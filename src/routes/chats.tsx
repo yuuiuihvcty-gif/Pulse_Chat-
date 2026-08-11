@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { Mic, Pencil, Search, VolumeX, Image as ImageIcon, Plus } from "lucide-react";
+import { Mic, Search, VolumeX, Image as ImageIcon, Plus } from "lucide-react";
 import { AppShell } from "@/components/pulse/AppShell";
 import { BottomNav, SideRail } from "@/components/pulse/Navigation";
 import { PulseAvatar } from "@/components/pulse/PulseAvatar";
@@ -14,7 +14,6 @@ import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { ConversationSummary } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/chats")({
   head: () => ({
@@ -214,5 +213,3 @@ function ChatRow({ conv }: { conv: ConversationSummary }) {
     </motion.li>
   );
 }
-
-void Pencil;
