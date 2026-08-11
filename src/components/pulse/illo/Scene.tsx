@@ -16,20 +16,21 @@ function seeded(n: number, seed = 7) {
 export function StarField({ count = 26, className }: { count?: number; className?: string }) {
   const reduce = useReducedMotion();
   const r = seeded(count * 3);
+  const v = (i: number) => r[i] ?? 0.5;
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
       {Array.from({ length: count }).map((_, i) => {
-        const size = 2 + r[i * 3] * 4;
+        const size = 2 + v(i * 3) * 4;
         return (
           <span
             key={i}
             className={cn("absolute rounded-full bg-brand-foreground/70", !reduce && "animate-twinkle")}
             style={{
-              left: `${r[i * 3 + 1] * 100}%`,
-              top: `${r[i * 3 + 2] * 100}%`,
+              left: `${v(i * 3 + 1) * 100}%`,
+              top: `${v(i * 3 + 2) * 100}%`,
               width: size,
               height: size,
-              animationDelay: `${r[i * 3] * 4}s`,
+              animationDelay: `${v(i * 3) * 4}s`,
             }}
           />
         );
