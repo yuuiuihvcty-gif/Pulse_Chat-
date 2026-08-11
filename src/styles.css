@@ -5,21 +5,23 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Pulse design system.
- * Palette: deep ink neutrals + electric aqua brand + warm coral accent.
- * All colors are oklch semantic tokens. Never hardcode colors in components.
+ * PULSE — THE LIVING MESSENGER
+ * Original motion-first illustrated design system.
+ * Base: soft neutral / deep midnight. Primary: electric blue-violet.
+ * Illustration accents: coral, amber, lime, cyan, orchid.
+ * Never hardcode colors in components — use these semantic tokens.
  */
 
 @theme inline {
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: calc(var(--radius) - 6px);
-  --radius-md: calc(var(--radius) - 3px);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 5px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 6px);
-  --radius-2xl: calc(var(--radius) + 12px);
-  --radius-3xl: calc(var(--radius) + 20px);
+  --radius-xl: calc(var(--radius) + 5px);
+  --radius-2xl: calc(var(--radius) + 10px);
+  --radius-3xl: calc(var(--radius) + 18px);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -43,110 +45,140 @@
   --color-ring-offset-background: var(--background);
 
   --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
   --color-brand-soft: var(--brand-soft);
   --color-brand-foreground: var(--brand-foreground);
   --color-coral: var(--coral);
+  --color-amber: var(--amber);
+  --color-lime: var(--lime);
+  --color-cyan: var(--cyan);
+  --color-orchid: var(--orchid);
   --color-online: var(--online);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
   --color-bubble-out: var(--bubble-out);
   --color-bubble-out-foreground: var(--bubble-out-foreground);
   --color-bubble-in: var(--bubble-in);
   --color-bubble-in-foreground: var(--bubble-in-foreground);
 
-  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.05), 0 8px 24px -12px oklch(0 0 0 / 0.14);
-  --shadow-float: 0 10px 40px -12px oklch(0 0 0 / 0.28);
-  --shadow-bubble: 0 1px 1px oklch(0 0 0 / 0.05), 0 6px 16px -12px oklch(0 0 0 / 0.25);
+  --shadow-soft: 0 1px 2px oklch(0.2 0.04 275 / 0.06), 0 10px 26px -14px oklch(0.2 0.04 275 / 0.2);
+  --shadow-float: 0 18px 50px -18px oklch(0.18 0.05 275 / 0.42);
+  --shadow-bubble: 0 1px 1px oklch(0.2 0.04 275 / 0.05), 0 8px 18px -14px oklch(0.2 0.04 275 / 0.3);
+  --shadow-press: 0 2px 0 0 oklch(0.2 0.04 275 / 0.12);
 
   --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --animate-dot: dot 1.2s ease-in-out infinite;
-  --animate-ring: ring 2.2s ease-out infinite;
+  --animate-dot: dot 1.4s ease-in-out infinite;
+  --animate-ring: ring 2.4s ease-out infinite;
   --animate-shimmer: shimmer 1.6s linear infinite;
   --animate-bars: bars 1s ease-in-out infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-drift: drift 16s ease-in-out infinite;
+  --animate-blink: blink 5.5s steps(1, end) infinite;
+  --animate-toss: toss 1.9s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  --animate-twinkle: twinkle 4s ease-in-out infinite;
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 1.15rem;
 
-  --background: oklch(0.985 0.004 220);
-  --foreground: oklch(0.19 0.02 250);
+  /* Motion tokens (ms) */
+  --t-micro: 140ms;
+  --t-small: 220ms;
+  --t-standard: 320ms;
+  --t-cinematic: 520ms;
+
+  --background: oklch(0.975 0.008 275);
+  --foreground: oklch(0.21 0.035 275);
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.965 0.006 220);
+  --surface-2: oklch(0.955 0.012 278);
+  --ink: oklch(0.21 0.035 275);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.19 0.02 250);
+  --card-foreground: oklch(0.21 0.035 275);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.19 0.02 250);
+  --popover-foreground: oklch(0.21 0.035 275);
 
-  --brand: oklch(0.63 0.13 205);
-  --brand-soft: oklch(0.94 0.03 205);
-  --brand-foreground: oklch(0.99 0.005 210);
-  --coral: oklch(0.7 0.16 30);
-  --online: oklch(0.72 0.17 155);
+  --brand: oklch(0.55 0.2 278);
+  --brand-2: oklch(0.63 0.17 258);
+  --brand-soft: oklch(0.93 0.04 278);
+  --brand-foreground: oklch(0.99 0.005 280);
+  --coral: oklch(0.68 0.18 22);
+  --amber: oklch(0.79 0.15 72);
+  --lime: oklch(0.75 0.16 148);
+  --cyan: oklch(0.73 0.13 210);
+  --orchid: oklch(0.68 0.18 320);
+  --online: oklch(0.72 0.17 152);
 
-  --primary: oklch(0.63 0.13 205);
-  --primary-foreground: oklch(0.99 0.005 210);
-  --secondary: oklch(0.955 0.008 225);
-  --secondary-foreground: oklch(0.26 0.02 250);
-  --muted: oklch(0.955 0.008 225);
-  --muted-foreground: oklch(0.53 0.02 250);
-  --accent: oklch(0.94 0.03 205);
-  --accent-foreground: oklch(0.3 0.06 210);
+  --primary: oklch(0.55 0.2 278);
+  --primary-foreground: oklch(0.99 0.005 280);
+  --secondary: oklch(0.955 0.012 278);
+  --secondary-foreground: oklch(0.28 0.035 275);
+  --muted: oklch(0.955 0.012 278);
+  --muted-foreground: oklch(0.53 0.03 275);
+  --accent: oklch(0.93 0.04 278);
+  --accent-foreground: oklch(0.34 0.09 278);
   --destructive: oklch(0.6 0.21 22);
-  --destructive-foreground: oklch(0.99 0.005 210);
+  --destructive-foreground: oklch(0.99 0.005 280);
 
-  --bubble-out: oklch(0.63 0.13 205);
-  --bubble-out-foreground: oklch(0.99 0.005 210);
+  --bubble-out: oklch(0.55 0.2 278);
+  --bubble-out-foreground: oklch(0.99 0.005 280);
   --bubble-in: oklch(1 0 0);
-  --bubble-in-foreground: oklch(0.2 0.02 250);
+  --bubble-in-foreground: oklch(0.21 0.035 275);
 
-  --border: oklch(0.905 0.008 230);
-  --input: oklch(0.9 0.008 230);
-  --ring: oklch(0.63 0.13 205);
+  --border: oklch(0.9 0.012 278);
+  --input: oklch(0.895 0.014 278);
+  --ring: oklch(0.55 0.2 278);
 
-  --wallpaper: radial-gradient(120% 80% at 10% 0%, oklch(0.95 0.035 205) 0%, transparent 60%),
-    radial-gradient(100% 70% at 100% 100%, oklch(0.95 0.03 30) 0%, transparent 55%),
-    linear-gradient(180deg, oklch(0.985 0.004 220), oklch(0.97 0.006 230));
+  --wallpaper: radial-gradient(120% 85% at 8% -10%, oklch(0.93 0.05 278) 0%, transparent 58%),
+    radial-gradient(95% 65% at 105% 105%, oklch(0.94 0.045 210) 0%, transparent 55%),
+    linear-gradient(180deg, oklch(0.978 0.008 278), oklch(0.962 0.01 268));
 }
 
 .dark {
-  --background: oklch(0.17 0.014 255);
-  --foreground: oklch(0.96 0.005 240);
-  --surface: oklch(0.215 0.016 255);
-  --surface-2: oklch(0.255 0.018 255);
-  --card: oklch(0.215 0.016 255);
-  --card-foreground: oklch(0.96 0.005 240);
-  --popover: oklch(0.235 0.017 255);
-  --popover-foreground: oklch(0.96 0.005 240);
+  --background: oklch(0.165 0.032 278);
+  --foreground: oklch(0.965 0.008 280);
+  --surface: oklch(0.215 0.036 278);
+  --surface-2: oklch(0.255 0.04 278);
+  --ink: oklch(0.13 0.03 278);
+  --card: oklch(0.215 0.036 278);
+  --card-foreground: oklch(0.965 0.008 280);
+  --popover: oklch(0.235 0.038 278);
+  --popover-foreground: oklch(0.965 0.008 280);
 
-  --brand: oklch(0.76 0.13 200);
-  --brand-soft: oklch(0.3 0.05 205);
-  --brand-foreground: oklch(0.17 0.02 250);
-  --coral: oklch(0.76 0.14 32);
-  --online: oklch(0.78 0.16 158);
+  --brand: oklch(0.72 0.16 280);
+  --brand-2: oklch(0.76 0.13 250);
+  --brand-soft: oklch(0.32 0.07 280);
+  --brand-foreground: oklch(0.15 0.03 278);
+  --coral: oklch(0.75 0.16 25);
+  --amber: oklch(0.84 0.14 78);
+  --lime: oklch(0.8 0.16 150);
+  --cyan: oklch(0.8 0.12 208);
+  --orchid: oklch(0.75 0.16 320);
+  --online: oklch(0.79 0.16 155);
 
-  --primary: oklch(0.76 0.13 200);
-  --primary-foreground: oklch(0.17 0.02 250);
-  --secondary: oklch(0.27 0.018 255);
-  --secondary-foreground: oklch(0.95 0.005 240);
-  --muted: oklch(0.27 0.018 255);
-  --muted-foreground: oklch(0.7 0.015 250);
-  --accent: oklch(0.3 0.05 205);
-  --accent-foreground: oklch(0.92 0.03 200);
-  --destructive: oklch(0.68 0.19 25);
-  --destructive-foreground: oklch(0.15 0.02 250);
+  --primary: oklch(0.72 0.16 280);
+  --primary-foreground: oklch(0.15 0.03 278);
+  --secondary: oklch(0.27 0.04 278);
+  --secondary-foreground: oklch(0.95 0.008 280);
+  --muted: oklch(0.27 0.04 278);
+  --muted-foreground: oklch(0.72 0.025 280);
+  --accent: oklch(0.32 0.07 280);
+  --accent-foreground: oklch(0.92 0.05 280);
+  --destructive: oklch(0.7 0.18 25);
+  --destructive-foreground: oklch(0.15 0.03 278);
 
-  --bubble-out: oklch(0.44 0.09 205);
-  --bubble-out-foreground: oklch(0.98 0.005 210);
-  --bubble-in: oklch(0.245 0.017 255);
-  --bubble-in-foreground: oklch(0.95 0.005 240);
+  --bubble-out: oklch(0.45 0.14 280);
+  --bubble-out-foreground: oklch(0.985 0.005 280);
+  --bubble-in: oklch(0.245 0.038 278);
+  --bubble-in-foreground: oklch(0.955 0.008 280);
 
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.76 0.13 200);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.72 0.16 280);
 
-  --wallpaper: radial-gradient(120% 80% at 5% 0%, oklch(0.28 0.05 205) 0%, transparent 58%),
-    radial-gradient(100% 70% at 100% 100%, oklch(0.26 0.045 320) 0%, transparent 55%),
-    linear-gradient(180deg, oklch(0.17 0.014 255), oklch(0.155 0.012 255));
+  --wallpaper: radial-gradient(120% 85% at 5% -8%, oklch(0.29 0.08 280) 0%, transparent 58%),
+    radial-gradient(95% 65% at 105% 105%, oklch(0.25 0.07 320) 0%, transparent 55%),
+    linear-gradient(180deg, oklch(0.175 0.032 278), oklch(0.15 0.028 278));
 }
 
 @layer base {
@@ -170,7 +202,7 @@
   h3,
   .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.022em;
   }
 }
 
@@ -180,9 +212,9 @@
 }
 
 @utility wp-aurora {
-  --wallpaper: radial-gradient(120% 80% at 10% 0%, oklch(0.95 0.035 205) 0%, transparent 60%),
-    radial-gradient(100% 70% at 100% 100%, oklch(0.95 0.03 30) 0%, transparent 55%),
-    linear-gradient(180deg, oklch(0.985 0.004 220), oklch(0.97 0.006 230));
+  --wallpaper: radial-gradient(120% 85% at 8% -10%, oklch(0.93 0.05 278) 0%, transparent 58%),
+    radial-gradient(95% 65% at 105% 105%, oklch(0.94 0.045 210) 0%, transparent 55%),
+    linear-gradient(180deg, oklch(0.978 0.008 278), oklch(0.962 0.01 268));
 }
 
 @utility wp-plain {
@@ -190,14 +222,14 @@
 }
 
 @utility wp-mint {
-  --wallpaper: radial-gradient(110% 70% at 90% 0%, oklch(0.93 0.06 165) 0%, transparent 60%),
-    linear-gradient(180deg, oklch(0.98 0.01 170), oklch(0.96 0.01 200));
+  --wallpaper: radial-gradient(110% 70% at 90% 0%, oklch(0.93 0.07 165) 0%, transparent 60%),
+    linear-gradient(180deg, oklch(0.98 0.012 170), oklch(0.962 0.012 210));
 }
 
 @utility wp-dusk {
-  --wallpaper: radial-gradient(120% 80% at 0% 0%, oklch(0.35 0.07 280) 0%, transparent 60%),
-    radial-gradient(110% 70% at 100% 100%, oklch(0.32 0.07 20) 0%, transparent 55%),
-    linear-gradient(180deg, oklch(0.2 0.02 265), oklch(0.16 0.02 260));
+  --wallpaper: radial-gradient(120% 80% at 0% 0%, oklch(0.34 0.09 285) 0%, transparent 60%),
+    radial-gradient(110% 70% at 100% 100%, oklch(0.31 0.08 20) 0%, transparent 55%),
+    linear-gradient(180deg, oklch(0.2 0.035 280), oklch(0.16 0.03 278));
 }
 
 @utility scrollbar-slim {
@@ -213,12 +245,39 @@
   }
 }
 
+/* Tactile press: scale + shadow, never opacity-only */
 @utility press {
   transition:
-    transform 0.16s cubic-bezier(0.34, 1.4, 0.64, 1),
-    background-color 0.2s ease;
+    transform var(--t-micro) cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow var(--t-small) ease,
+    background-color var(--t-small) ease;
   &:active {
-    transform: scale(0.97);
+    transform: scale(0.96) translateY(1px);
+    box-shadow: none;
+  }
+}
+
+/* Proprietary Pulse bubble geometry: soft asymmetric tails */
+@utility bubble-out-shape {
+  border-radius: 22px 22px 8px 22px;
+}
+
+@utility bubble-in-shape {
+  border-radius: 22px 22px 22px 8px;
+}
+
+@utility pulse-grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+      oklch(0.55 0.2 278 / 0.07) 1px,
+      transparent 1.4px
+    );
+    background-size: 22px 22px;
   }
 }
 
@@ -240,9 +299,9 @@
   0%,
   100% {
     transform: translateY(0);
-    opacity: 0.45;
+    opacity: 0.4;
   }
-  50% {
+  45% {
     transform: translateY(-3px);
     opacity: 1;
   }
@@ -251,10 +310,10 @@
 @keyframes ring {
   0% {
     transform: scale(0.9);
-    opacity: 0.5;
+    opacity: 0.55;
   }
   100% {
-    transform: scale(1.9);
+    transform: scale(2);
     opacity: 0;
   }
 }
@@ -278,6 +337,61 @@
   }
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14px, -18px, 0) scale(1.04);
+  }
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes toss {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-26px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
 @utility skeleton {
   background-image: linear-gradient(
     90deg,
@@ -287,4 +401,14 @@
   );
   background-size: 200% 100%;
   animation: var(--animate-shimmer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
