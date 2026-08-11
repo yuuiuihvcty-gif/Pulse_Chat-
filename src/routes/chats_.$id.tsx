@@ -344,7 +344,7 @@ function Thread() {
           const el = e.currentTarget;
           setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 120);
         }}
-        className={cn("relative flex-1 overflow-y-auto scrollbar-slim", `wp-${settings.wallpaper}`, "wallpaper")}
+        className={cn("relative flex-1 overflow-y-auto scrollbar-slim", `wp-${settings?.wallpaper ?? "aurora"}`, "wallpaper")}
       >
         {messages.isLoading ? (
           <BubbleSkeleton />
@@ -378,7 +378,7 @@ function Thread() {
                     reactions={reactionsFor(m.id)}
                     seen={seenByOther(m)}
                     highlight={highlight === m.id}
-                    searchTerm={searchOpen ? term : undefined}
+                    {...(searchOpen && term ? { searchTerm: term } : {})}
                     actions={actionsFor(m)}
                     showAvatar={!!conversation.data?.is_group}
                   />
@@ -415,7 +415,7 @@ function Thread() {
         onCancelReply={() => setReplyTo(null)}
         editing={editing}
         onCancelEdit={() => setEditing(null)}
-        enterToSend={settings.enter_to_send}
+        enterToSend={settings?.enter_to_send ?? true}
         onSendText={sendText}
         onSendAttachment={(a, caption) => void sendAttachment(a, caption)}
         onActivity={live.emit}
