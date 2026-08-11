@@ -198,10 +198,10 @@ export function MessageBubble({
           }}
           whileTap={{ scale: 0.985 }}
           className={cn(
-            "relative rounded-3xl px-3.5 py-2.5 shadow-bubble",
+            "relative px-3.5 py-2.5 shadow-bubble",
             mine
-              ? "rounded-br-lg bg-bubble-out text-bubble-out-foreground"
-              : "rounded-bl-lg border border-border bg-bubble-in text-bubble-in-foreground",
+              ? "bubble-out-shape bg-bubble-out text-bubble-out-foreground"
+              : "bubble-in-shape border border-border bg-bubble-in text-bubble-in-foreground",
           )}
         >
           {message.pinned && (
