@@ -73,8 +73,8 @@ export const POSES = {
   close: {
     ...base,
     x: 2,
-    y: 12,
-    scale: 1.5,
+    y: 4,
+    scale: 1.3,
     rot: -1,
     head: -3,
     torso: 2,
