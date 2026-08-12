@@ -131,7 +131,7 @@ export const POSES = {
     legL: [8, 4],
     legR: [-8, -4],
   },
-};
+} satisfies Record<string, Pose>;
 
 const PALETTES: Record<Palette, { a: string; b: string; c: string }> = {
   cyan: { a: "var(--iris-cyan)", b: "var(--iris-blue)", c: "var(--iris-violet)" },
