@@ -329,13 +329,13 @@ export function Humanoid({
       </motion.g>
 
       {/* arms */}
-      <Limb upper={pose.armL[0]} fore={pose.armL[1]} side={1} origin={[176, 250]} />
-      <Limb upper={pose.armR[0]} fore={pose.armR[1]} side={-1} origin={[344, 250]} />
+      <Limb upper={pose.armL[0]} fore={pose.armL[1]} origin={[176, 250]} />
+      <Limb upper={pose.armR[0]} fore={pose.armR[1]} origin={[344, 250]} />
 
       {/* hips + legs */}
       <ellipse cx="260" cy="552" rx="78" ry="34" fill="url(#bodyFill)" stroke="url(#edge)" strokeWidth="1" />
-      <Limb upper={pose.legL[0]} fore={pose.legL[1]} side={1} origin={[224, 574]} />
-      <Limb upper={pose.legR[0]} fore={pose.legR[1]} side={-1} origin={[296, 574]} />
+      <Limb upper={pose.legL[0]} fore={pose.legL[1]} origin={[224, 574]} />
+      <Limb upper={pose.legR[0]} fore={pose.legR[1]} origin={[296, 574]} />
 
       {/* contact shadow */}
       <ellipse cx="260" cy="906" rx="130" ry="16" fill={pal.b} opacity="0.16" />
