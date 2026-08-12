@@ -39,7 +39,7 @@ const base: Pose = {
   palette: "cyan",
 };
 
-export const POSES: Record<string, Pose> = {
+export const POSES = {
   /* 0s — hero, figure cropped on the right, contemplative lean */
   hero: { ...base, x: 6, y: 2, scale: 1.02, rot: -3, head: -6, torso: 3, armL: [26, 34], armR: [-14, -46] },
   /* ~3.3s — warmer, rotated, reaching up */
