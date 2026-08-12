@@ -412,3 +412,75 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ============================================================
+   IRIS / CLARIX — EDITORIAL LANDING SURFACE
+   Off-white canvas, pastel atmospheric glow, translucent glass figure.
+   ============================================================ */
+
+:root {
+  --canvas: oklch(0.976 0.004 250);
+  --canvas-2: oklch(0.995 0.002 250);
+  --editorial: oklch(0.17 0.012 260);
+  --editorial-muted: oklch(0.52 0.014 260);
+  --editorial-line: oklch(0.17 0.012 260 / 0.12);
+
+  --iris-cyan: oklch(0.82 0.13 210);
+  --iris-blue: oklch(0.68 0.16 258);
+  --iris-pink: oklch(0.83 0.11 350);
+  --iris-orange: oklch(0.86 0.11 62);
+  --iris-violet: oklch(0.76 0.13 300);
+}
+
+@theme inline {
+  --font-editorial: "Instrument Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-canvas-2: var(--canvas-2);
+  --color-editorial: var(--editorial);
+  --color-editorial-muted: var(--editorial-muted);
+  --color-editorial-line: var(--editorial-line);
+  --color-iris-cyan: var(--iris-cyan);
+  --color-iris-blue: var(--iris-blue);
+  --color-iris-pink: var(--iris-pink);
+  --color-iris-orange: var(--iris-orange);
+  --color-iris-violet: var(--iris-violet);
+}
+
+/* Fine film grain over the whole editorial canvas */
+@utility film-grain {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.42;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.28'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+}
+
+@utility editorial-label {
+  font-family: var(--font-editorial);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--editorial-muted);
+}
+
+@utility editorial-display {
+  font-family: var(--font-editorial);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--editorial);
+}
+
+@utility glass-panel {
+  background: color-mix(in oklab, white 72%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  border: 1px solid oklch(1 0 0 / 0.6);
+  box-shadow: 0 24px 70px -34px oklch(0.4 0.05 260 / 0.35);
+}
