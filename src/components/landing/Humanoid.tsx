@@ -334,8 +334,8 @@ export function Humanoid({
 
       {/* hips + legs */}
       <ellipse cx="260" cy="552" rx="78" ry="34" fill="url(#bodyFill)" stroke="url(#edge)" strokeWidth="1" />
-      <Limb upper={pose.legL[0]} fore={pose.legL[1]} origin={[224, 574]} />
-      <Limb upper={pose.legR[0]} fore={pose.legR[1]} origin={[296, 574]} />
+      <Limb upper={pose.legL[0]} fore={pose.legL[1]} origin={[224, 566]} len={[128, 118]} width={[32, 25]} />
+      <Limb upper={pose.legR[0]} fore={pose.legR[1]} origin={[296, 566]} len={[128, 118]} width={[32, 25]} />
 
       {/* contact shadow */}
       <ellipse cx="260" cy="906" rx="130" ry="16" fill={pal.b} opacity="0.16" />
