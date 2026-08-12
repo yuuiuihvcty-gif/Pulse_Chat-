@@ -41,7 +41,7 @@ const base: Pose = {
 
 export const POSES = {
   /* 0s — hero, figure cropped on the right, contemplative lean */
-  hero: { ...base, x: 6, y: 2, scale: 1.02, rot: -3, head: -6, torso: 3, armL: [26, 34], armR: [-14, -46] },
+  hero: { ...base, x: 6, y: 2, scale: 1.02, rot: -3, head: -6, torso: 3, }, armL: [-14, -10], armR: [16, 12], legL: [-4, 3], legR: [4, -3]
   /* ~3.3s — warmer, rotated, reaching up */
   reach: {
     ...base,
@@ -52,11 +52,7 @@ export const POSES = {
     rot: 6,
     head: 10,
     torso: -6,
-    armL: [-118, -28],
-    armR: [40, 62],
-    legL: [10, 6],
-    legR: [-14, -10],
-  },
+  }, armL: [-150, -22], armR: [26, 30], legL: [-8, 6], legR: [10, -5]
   /* ~5s — close crop, glossy cyan, arms folded low */
   close: {
     ...base,
@@ -66,11 +62,7 @@ export const POSES = {
     rot: -1,
     head: -3,
     torso: 2,
-    armL: [58, 74],
-    armR: [-52, -70],
-    legL: [2, 2],
-    legR: [-2, -2],
-  },
+  }, armL: [-38, -58], armR: [40, 60], legL: [-3, 2], legR: [3, -2]
   /* ~6.7–8.3s — kinetic, mid-stride behind giant type */
   kinetic: {
     ...base,
@@ -81,13 +73,9 @@ export const POSES = {
     rot: -8,
     head: 8,
     torso: -10,
-    armL: [-64, -86],
-    armR: [72, 30],
-    legL: [26, 18],
-    legR: [-30, -22],
-  },
+  }, armL: [-72, -46], armR: [58, 34], legL: [-30, 22], legR: [26, -16]
   /* ~10s — blurred backdrop for the stats panel */
-  recede: { ...base, x: 4, y: 6, scale: 1.24, rot: 2, head: -2, armL: [18, 26], armR: [-20, -30] },
+  recede: { ...base, x: 4, y: 6, scale: 1.24, rot: 2, head: -2, }, armL: [-18, -14], armR: [20, 16], legL: [-5, 4], legR: [5, -4]
   /* ~11.6s — tall standing pose beside the statement */
   tall: {
     ...base,
@@ -98,11 +86,7 @@ export const POSES = {
     rot: 1,
     head: -10,
     torso: 1,
-    armL: [10, 12],
-    armR: [-6, -14],
-    legL: [1, 1],
-    legR: [-1, -1],
-  },
+  }, armL: [-8, -6], armR: [9, 7], legL: [-2, 1], legR: [2, -1]
   /* ~14–15s — brand section, gentle turn away */
   brand: {
     ...base,
@@ -113,9 +97,7 @@ export const POSES = {
     rot: -5,
     head: 14,
     torso: 8,
-    armL: [34, 48],
-    armR: [-40, -18],
-  },
+  }, armL: [-34, -52], armR: [22, 18], legL: [-6, 5], legR: [7, -4]
   /* ~16.6s — final composition, open arms */
   finale: {
     ...base,
@@ -126,11 +108,7 @@ export const POSES = {
     rot: 0,
     head: 0,
     torso: 0,
-    armL: [-46, -22],
-    armR: [46, 22],
-    legL: [8, 4],
-    legR: [-8, -4],
-  },
+  }, armL: [-58, -34], armR: [60, 36], legL: [-11, 7], legR: [11, -7]
 } satisfies Record<string, Pose>;
 
 const PALETTES: Record<Palette, { a: string; b: string; c: string }> = {
@@ -329,16 +307,16 @@ export function Humanoid({
       </motion.g>
 
       {/* arms */}
-      <Limb upper={pose.armL[0]} fore={pose.armL[1]} origin={[176, 250]} />
-      <Limb upper={pose.armR[0]} fore={pose.armR[1]} origin={[344, 250]} />
+      <Limb upper={pose.armL[0]} fore={pose.armL[1]} origin={[178, 252]} len={[104, 96]} width={[28, 22]} />
+      <Limb upper={pose.armR[0]} fore={pose.armR[1]} origin={[342, 252]} len={[104, 96]} width={[28, 22]} />
 
       {/* hips + legs */}
       <ellipse cx="260" cy="552" rx="78" ry="34" fill="url(#bodyFill)" stroke="url(#edge)" strokeWidth="1" />
-      <Limb upper={pose.legL[0]} fore={pose.legL[1]} origin={[224, 566]} len={[128, 118]} width={[32, 25]} />
-      <Limb upper={pose.legR[0]} fore={pose.legR[1]} origin={[296, 566]} len={[128, 118]} width={[32, 25]} />
+      <Limb upper={pose.legL[0]} fore={pose.legL[1]} origin={[224, 566]} len={[152, 140]} width={[34, 27]} />
+      <Limb upper={pose.legR[0]} fore={pose.legR[1]} origin={[296, 566]} len={[152, 140]} width={[34, 27]} />
 
       {/* contact shadow */}
-      <ellipse cx="260" cy="906" rx="130" ry="16" fill={pal.b} opacity="0.16" />
+      <ellipse cx="260" cy="882" rx="132" ry="16" fill={pal.b} opacity="0.16" />
     </motion.svg>
   );
 }
