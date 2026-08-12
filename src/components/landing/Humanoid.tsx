@@ -41,7 +41,19 @@ const base: Pose = {
 
 export const POSES = {
   /* 0s — hero, figure cropped on the right, contemplative lean */
-  hero: { ...base, x: 6, y: 2, scale: 1.02, rot: -3, head: -6, torso: 3, }, armL: [-14, -10], armR: [16, 12], legL: [-4, 3], legR: [4, -3]
+  hero: {
+    ...base,
+    x: 6,
+    y: 2,
+    scale: 1.02,
+    rot: -3,
+    head: -6,
+    torso: 3,
+    armL: [-14, -10],
+    armR: [16, 12],
+    legL: [-4, 3],
+    legR: [4, -3],
+  },
   /* ~3.3s — warmer, rotated, reaching up */
   reach: {
     ...base,
@@ -52,7 +64,11 @@ export const POSES = {
     rot: 6,
     head: 10,
     torso: -6,
-  }, armL: [-150, -22], armR: [26, 30], legL: [-8, 6], legR: [10, -5]
+    armL: [-150, -22],
+    armR: [26, 30],
+    legL: [-8, 6],
+    legR: [10, -5],
+  },
   /* ~5s — close crop, glossy cyan, arms folded low */
   close: {
     ...base,
@@ -62,7 +78,11 @@ export const POSES = {
     rot: -1,
     head: -3,
     torso: 2,
-  }, armL: [-38, -58], armR: [40, 60], legL: [-3, 2], legR: [3, -2]
+    armL: [-38, -58],
+    armR: [40, 60],
+    legL: [-3, 2],
+    legR: [3, -2],
+  },
   /* ~6.7–8.3s — kinetic, mid-stride behind giant type */
   kinetic: {
     ...base,
@@ -73,9 +93,24 @@ export const POSES = {
     rot: -8,
     head: 8,
     torso: -10,
-  }, armL: [-72, -46], armR: [58, 34], legL: [-30, 22], legR: [26, -16]
+    armL: [-72, -46],
+    armR: [58, 34],
+    legL: [-30, 22],
+    legR: [26, -16],
+  },
   /* ~10s — blurred backdrop for the stats panel */
-  recede: { ...base, x: 4, y: 6, scale: 1.24, rot: 2, head: -2, }, armL: [-18, -14], armR: [20, 16], legL: [-5, 4], legR: [5, -4]
+  recede: {
+    ...base,
+    x: 4,
+    y: 6,
+    scale: 1.24,
+    rot: 2,
+    head: -2,
+    armL: [-18, -14],
+    armR: [20, 16],
+    legL: [-5, 4],
+    legR: [5, -4],
+  },
   /* ~11.6s — tall standing pose beside the statement */
   tall: {
     ...base,
@@ -86,7 +121,11 @@ export const POSES = {
     rot: 1,
     head: -10,
     torso: 1,
-  }, armL: [-8, -6], armR: [9, 7], legL: [-2, 1], legR: [2, -1]
+    armL: [-8, -6],
+    armR: [9, 7],
+    legL: [-2, 1],
+    legR: [2, -1],
+  },
   /* ~14–15s — brand section, gentle turn away */
   brand: {
     ...base,
@@ -97,7 +136,11 @@ export const POSES = {
     rot: -5,
     head: 14,
     torso: 8,
-  }, armL: [-34, -52], armR: [22, 18], legL: [-6, 5], legR: [7, -4]
+    armL: [-34, -52],
+    armR: [22, 18],
+    legL: [-6, 5],
+    legR: [7, -4],
+  },
   /* ~16.6s — final composition, open arms */
   finale: {
     ...base,
@@ -108,7 +151,11 @@ export const POSES = {
     rot: 0,
     head: 0,
     torso: 0,
-  }, armL: [-58, -34], armR: [60, 36], legL: [-11, 7], legR: [11, -7]
+    armL: [-58, -34],
+    armR: [60, 36],
+    legL: [-11, 7],
+    legR: [11, -7],
+  },
 } satisfies Record<string, Pose>;
 
 const PALETTES: Record<Palette, { a: string; b: string; c: string }> = {
