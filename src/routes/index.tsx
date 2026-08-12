@@ -29,15 +29,15 @@ export const Route = createFileRoute("/")({
 
 /** Figure choreography, one entry per act of the scroll sequence. */
 const ACTS: { pose: Pose; figX: string; blur: number; opacity: number }[] = [
-  { pose: POSES.hero!, figX: "26%", blur: 0, opacity: 1 },
-  { pose: POSES.reach!, figX: "18%", blur: 0, opacity: 1 },
-  { pose: POSES.close!, figX: "4%", blur: 0, opacity: 1 },
-  { pose: POSES.kinetic!, figX: "-2%", blur: 1.5, opacity: 0.92 },
-  { pose: POSES.kinetic!, figX: "8%", blur: 1.5, opacity: 0.92 },
-  { pose: POSES.recede!, figX: "0%", blur: 10, opacity: 0.85 },
-  { pose: POSES.tall!, figX: "-22%", blur: 0, opacity: 1 },
-  { pose: POSES.brand!, figX: "24%", blur: 6, opacity: 0.6 },
-  { pose: POSES.finale!, figX: "0%", blur: 0, opacity: 1 },
+  { pose: POSES.hero, figX: "26%", blur: 0, opacity: 1 },
+  { pose: POSES.reach, figX: "18%", blur: 0, opacity: 1 },
+  { pose: POSES.close, figX: "4%", blur: 0, opacity: 1 },
+  { pose: POSES.kinetic, figX: "-2%", blur: 1.5, opacity: 0.92 },
+  { pose: POSES.kinetic, figX: "8%", blur: 1.5, opacity: 0.92 },
+  { pose: POSES.recede, figX: "0%", blur: 10, opacity: 0.85 },
+  { pose: POSES.tall, figX: "-22%", blur: 0, opacity: 1 },
+  { pose: POSES.brand, figX: "24%", blur: 6, opacity: 0.6 },
+  { pose: POSES.finale, figX: "0%", blur: 0, opacity: 1 },
 ];
 
 function Landing() {
