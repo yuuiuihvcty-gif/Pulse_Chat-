@@ -141,67 +141,73 @@ const PALETTES: Record<Palette, { a: string; b: string; c: string }> = {
 
 const spring = { type: "spring" as const, stiffness: 60, damping: 18, mass: 1.1 };
 
+/**
+ * Two-segment limb solved with forward kinematics so joints never detach.
+ * Angles are degrees from straight-down; positive swings toward +x.
+ */
 function Limb({
   upper,
   fore,
-  side,
   origin,
+  len = [96, 92],
+  width = [23, 18],
 }: {
   upper: number;
   fore: number;
-  side: 1 | -1;
   origin: [number, number];
+  len?: [number, number];
+  width?: [number, number];
 }) {
   const [ox, oy] = origin;
+  const r1 = (upper * Math.PI) / 180;
+  const r2 = ((upper + fore) * Math.PI) / 180;
+  const jx = ox + Math.sin(r1) * len[0];
+  const jy = oy + Math.cos(r1) * len[0];
+  const ex = jx + Math.sin(r2) * len[1];
+  const ey = jy + Math.cos(r2) * len[1];
+
   return (
-    <motion.g animate={{ rotate: upper }} transition={spring} style={{ originX: `${ox}px`, originY: `${oy}px` }}>
-      <rect
-        x={ox - 11}
-        y={oy - 8}
-        width={22}
-        height={92}
-        rx={11}
-        fill="url(#limbFill)"
-        stroke="url(#edge)"
-        strokeWidth={1}
-      />
-      <ellipse cx={ox} cy={oy + 78} rx={13} ry={13} fill="url(#jointFill)" />
-      <motion.g
-        animate={{ rotate: fore }}
+    <g>
+      <motion.line
+        animate={{ x1: ox, y1: oy, x2: jx, y2: jy }}
         transition={spring}
-        style={{ originX: `${ox}px`, originY: `${oy + 78}px` }}
-      >
-        <rect
-          x={ox - 9}
-          y={oy + 70}
-          width={18}
-          height={88}
-          rx={9}
-          fill="url(#limbFill)"
-          stroke="url(#edge)"
-          strokeWidth={1}
-        />
-        <ellipse cx={ox} cy={oy + 162} rx={12} ry={14} fill="url(#gloss)" opacity={0.9} />
-        <rect
-          x={ox - 6.5}
-          y={oy + 92}
-          width={13}
-          height={40}
-          rx={7}
-          fill="none"
-          stroke="url(#wire)"
-          strokeWidth={0.8}
-        />
-      </motion.g>
-      <line
-        x1={ox - side * 5}
-        y1={oy + 6}
-        x2={ox - side * 5}
-        y2={oy + 68}
-        stroke="url(#wire)"
-        strokeWidth={0.9}
+        stroke="url(#limbFill)"
+        strokeWidth={width[0]}
+        strokeLinecap="round"
       />
-    </motion.g>
+      <motion.line
+        animate={{ x1: ox, y1: oy, x2: jx, y2: jy }}
+        transition={spring}
+        stroke="url(#edge)"
+        strokeWidth={width[0] - 12}
+        strokeLinecap="round"
+        opacity={0.5}
+      />
+      <motion.line
+        animate={{ x1: jx, y1: jy, x2: ex, y2: ey }}
+        transition={spring}
+        stroke="url(#limbFill)"
+        strokeWidth={width[1]}
+        strokeLinecap="round"
+      />
+      <motion.line
+        animate={{ x1: jx, y1: jy, x2: ex, y2: ey }}
+        transition={spring}
+        stroke="url(#wire)"
+        strokeWidth={1}
+        strokeLinecap="round"
+        opacity={0.6}
+      />
+      <motion.circle animate={{ cx: jx, cy: jy }} transition={spring} r={width[0] * 0.62} fill="url(#jointFill)" />
+      <motion.circle animate={{ cx: ex, cy: ey }} transition={spring} r={width[1] * 0.7} fill="url(#jointFill)" />
+      <motion.circle
+        animate={{ cx: ex - 2, cy: ey - 3 }}
+        transition={spring}
+        r={width[1] * 0.26}
+        fill="#fff"
+        opacity={0.75}
+      />
+    </g>
   );
 }
 
