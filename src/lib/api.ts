@@ -557,12 +557,124 @@ export async function logCall(input: {
   );
 }
 
+export async function updateCall(
+  id: string,
+  patch: Partial<{
+    status: "missed" | "answered" | "declined";
+    duration_seconds: number;
+    started_at: string | null;
+    ended_at: string | null;
+  }>,
+) {
+  unwrap(await supabase.from("calls").update(patch).eq("id", id).select("id").single());
+}
+
+export async function createCall(input: {
+  callerId: string;
+  calleeId: string;
+  type: "voice" | "video";
+  conversationId?: string | null;
+}) {
+  return unwrap(
+    await supabase
+      .from("calls")
+      .insert({
+        caller_id: input.callerId,
+        callee_id: input.calleeId,
+        type: input.type,
+        status: "missed",
+        conversation_id: input.conversationId ?? null,
+      })
+      .select("id,caller_id,callee_id,type,status,duration_seconds,created_at")
+      .single(),
+  ) as CallRecord;
+}
+
+/** WebRTC signalling: offers, answers and ICE candidates for one call. */
+export async function sendCallSignal(input: {
+  callId: string;
+  senderId: string;
+  kind: "offer" | "answer" | "candidate" | "hangup";
+  payload: Record<string, unknown>;
+}) {
+  unwrap(
+    await supabase
+      .from("call_signals")
+      .insert({
+        call_id: input.callId,
+        sender_id: input.senderId,
+        kind: input.kind,
+        payload: input.payload as never,
+      })
+      .select("id"),
+  );
+}
+
+/* ---------------- reports ---------------- */
+
+export async function reportUser(input: {
+  reporterId: string;
+  reportedId: string;
+  reason: string;
+  details?: string | null;
+  messageId?: string | null;
+  conversationId?: string | null;
+}) {
+  unwrap(
+    await supabase
+      .from("reports")
+      .insert({
+        reporter_id: input.reporterId,
+        reported_id: input.reportedId,
+        reason: input.reason,
+        details: input.details ?? null,
+        message_id: input.messageId ?? null,
+        conversation_id: input.conversationId ?? null,
+      })
+      .select("id"),
+  );
+}
+
+/* ---------------- forwarding ---------------- */
+
+export async function forwardMessage(input: {
+  message: Message;
+  senderId: string;
+  conversationIds: string[];
+}) {
+  if (input.conversationIds.length === 0) return;
+  unwrap(
+    await supabase
+      .from("messages")
+      .insert(
+        input.conversationIds.map((conversation_id) => ({
+          conversation_id,
+          sender_id: input.senderId,
+          type: input.message.type,
+          body: input.message.body,
+          media_url: input.message.media_url,
+          media_meta: { ...input.message.media_meta, forwarded: true } as never,
+        })),
+      )
+      .select("id"),
+  );
+}
+
 /* ---------------- global search ---------------- */
 
-export async function globalSearch(term: string, me: string) {
+export type GlobalSearchResult = {
+  people: Profile[];
+  messages: Message[];
+  media: Message[];
+  conversations: ConversationSummary[];
+};
+
+export async function globalSearch(term: string, me: string): Promise<GlobalSearchResult> {
   const t = term.trim();
-  if (t.length < 2) return { people: [] as Profile[], messages: [] as Message[] };
-  const [people, messages] = await Promise.all([
+  const empty: GlobalSearchResult = { people: [], messages: [], media: [], conversations: [] };
+  if (t.length < 2) return empty;
+
+  const [people, textRes, mediaRes, conversations] = await Promise.all([
     searchProfiles(t, me),
     supabase
       .from("messages")
@@ -571,6 +683,35 @@ export async function globalSearch(term: string, me: string) {
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(30),
+    supabase
+      .from("messages")
+      .select("*")
+      .in("type", ["image", "video", "file", "voice"])
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(60),
+    listConversations(me),
   ]);
-  return { people, messages: (unwrap(messages) ?? []) as Message[] };
+
+  const lower = t.toLowerCase();
+  const media = ((unwrap(mediaRes) ?? []) as Message[]).filter((m) => {
+    const meta = m.media_meta as { name?: string };
+    return (
+      (meta?.name ?? "").toLowerCase().includes(lower) ||
+      (m.body ?? "").toLowerCase().includes(lower)
+    );
+  });
+
+  return {
+    people,
+    messages: (unwrap(textRes) ?? []) as Message[],
+    media,
+    conversations: conversations.filter((c) => {
+      const label = c.is_group ? (c.name ?? "") : (c.other?.display_name ?? "");
+      return (
+        label.toLowerCase().includes(lower) ||
+        (c.other?.username ?? "").toLowerCase().includes(lower)
+      );
+    }),
+  };
 }
