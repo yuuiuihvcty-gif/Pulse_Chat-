@@ -35,6 +35,41 @@ export type Database = {
         }
         Relationships: []
       }
+      call_signals: {
+        Row: {
+          call_id: string
+          created_at: string
+          id: string
+          kind: string
+          payload: Json
+          sender_id: string
+        }
+        Insert: {
+          call_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          sender_id: string
+        }
+        Update: {
+          call_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_signals_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calls: {
         Row: {
           callee_id: string
@@ -42,7 +77,9 @@ export type Database = {
           conversation_id: string | null
           created_at: string
           duration_seconds: number
+          ended_at: string | null
           id: string
+          started_at: string | null
           status: string
           type: string
         }
@@ -52,7 +89,9 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string
           duration_seconds?: number
+          ended_at?: string | null
           id?: string
+          started_at?: string | null
           status?: string
           type?: string
         }
@@ -62,7 +101,9 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string
           duration_seconds?: number
+          ended_at?: string | null
           id?: string
+          started_at?: string | null
           status?: string
           type?: string
         }
@@ -369,6 +410,60 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          details: string | null
+          id: string
+          message_id: string | null
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          message_id?: string | null
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          message_id?: string | null
+          reason?: string
+          reported_id?: string
+          reporter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stories: {
         Row: {
           background: string | null
@@ -497,13 +592,60 @@ export type Database = {
         Args: { _message_id: string; _user_id: string }
         Returns: boolean
       }
+      conversation_overview: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          id: string
+          is_group: boolean
+          last_body: string
+          last_created_at: string
+          last_deleted_at: string
+          last_media_url: string
+          last_message_at: string
+          last_message_id: string
+          last_read_at: string
+          last_sender_id: string
+          last_type: string
+          muted: boolean
+          name: string
+          other_id: string
+          unread: number
+        }[]
+      }
       get_or_create_direct_conversation: {
         Args: { _other: string }
         Returns: string
       }
+      is_call_party: {
+        Args: { _call_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_member: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
+      }
+      my_profile: {
+        Args: never
+        Returns: {
+          about: string | null
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_online: boolean
+          last_seen: string
+          mood: string | null
+          phone: string | null
+          updated_at: string
+          username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       owns_conversation: {
         Args: { _conversation_id: string; _user_id: string }
