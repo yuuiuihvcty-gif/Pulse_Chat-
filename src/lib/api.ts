@@ -76,84 +76,67 @@ export async function updateSettings(userId: string, patch: Partial<UserSettings
 
 /* ---------------- conversations ---------------- */
 
-export async function listConversations(me: string): Promise<ConversationSummary[]> {
-  const rows = unwrap(
-    await supabase
-      .from("conversation_members")
-      .select("conversation_id,muted,last_read_at,conversations(*)")
-      .eq("user_id", me),
-  ) as Array<{
-    conversation_id: string;
-    muted: boolean;
-    last_read_at: string;
-    conversations: {
-      id: string;
-      is_group: boolean;
-      name: string | null;
-      avatar_url: string | null;
-      last_message_at: string;
-    } | null;
-  }>;
+type OverviewRow = {
+  id: string;
+  is_group: boolean;
+  name: string | null;
+  avatar_url: string | null;
+  last_message_at: string;
+  muted: boolean;
+  last_read_at: string;
+  unread: number;
+  other_id: string | null;
+  last_message_id: string | null;
+  last_sender_id: string | null;
+  last_type: MessageType | null;
+  last_body: string | null;
+  last_media_url: string | null;
+  last_deleted_at: string | null;
+  last_created_at: string | null;
+};
 
-  const ids = rows.map((r) => r.conversation_id);
-  if (ids.length === 0) return [];
+/**
+ * One database round-trip: every conversation with its last message and unread
+ * count computed server-side (no more downloading hundreds of messages).
+ */
+export async function listConversations(_me: string): Promise<ConversationSummary[]> {
+  const { data, error } = await supabase.rpc("conversation_overview");
+  if (error) throw new Error(error.message);
+  const rows = (data ?? []) as OverviewRow[];
+  if (rows.length === 0) return [];
 
-  const [others, messages] = await Promise.all([
-    supabase
-      .from("conversation_members")
-      .select("conversation_id,user_id")
-      .in("conversation_id", ids)
-      .neq("user_id", me),
-    supabase
-      .from("messages")
-      .select("*")
-      .in("conversation_id", ids)
-      .order("created_at", { ascending: false })
-      .limit(600),
-  ]);
+  const profiles = await getProfilesByIds(
+    rows.map((r) => r.other_id).filter((v): v is string => !!v),
+  );
+  const byId = new Map(profiles.map((p) => [p.id, p]));
 
-  const otherRows = (unwrap(others) ?? []) as Array<{
-    conversation_id: string;
-    user_id: string;
-  }>;
-  const msgRows = (unwrap(messages) ?? []) as Message[];
-  const profiles = await getProfilesByIds(otherRows.map((r) => r.user_id));
-  const profileById = new Map(profiles.map((p) => [p.id, p]));
-
-  const otherByConv = new Map<string, Profile>();
-  otherRows.forEach((r) => {
-    const p = profileById.get(r.user_id);
-    if (p && !otherByConv.has(r.conversation_id)) otherByConv.set(r.conversation_id, p);
-  });
-
-
-  const lastByConv = new Map<string, Message>();
-  const unreadByConv = new Map<string, number>();
-  const lastReadByConv = new Map(rows.map((r) => [r.conversation_id, r.last_read_at]));
-
-  msgRows.forEach((m) => {
-    if (!lastByConv.has(m.conversation_id)) lastByConv.set(m.conversation_id, m);
-    const lastRead = lastReadByConv.get(m.conversation_id);
-    if (m.sender_id !== me && lastRead && new Date(m.created_at) > new Date(lastRead)) {
-      unreadByConv.set(m.conversation_id, (unreadByConv.get(m.conversation_id) ?? 0) + 1);
-    }
-  });
-
-  return rows
-    .filter((r) => r.conversations)
-    .map((r) => ({
-      id: r.conversation_id,
-      is_group: r.conversations!.is_group,
-      name: r.conversations!.name,
-      avatar_url: r.conversations!.avatar_url,
-      last_message_at: r.conversations!.last_message_at,
-      muted: r.muted,
-      last_read_at: r.last_read_at,
-      unread: unreadByConv.get(r.conversation_id) ?? 0,
-      other: otherByConv.get(r.conversation_id) ?? null,
-      lastMessage: lastByConv.get(r.conversation_id) ?? null,
-    }))
-    .sort((a, b) => +new Date(b.last_message_at) - +new Date(a.last_message_at));
+  return rows.map((r) => ({
+    id: r.id,
+    is_group: r.is_group,
+    name: r.name,
+    avatar_url: r.avatar_url,
+    last_message_at: r.last_message_at,
+    muted: r.muted,
+    last_read_at: r.last_read_at,
+    unread: r.unread,
+    other: r.other_id ? (byId.get(r.other_id) ?? null) : null,
+    lastMessage: r.last_message_id
+      ? ({
+          id: r.last_message_id,
+          conversation_id: r.id,
+          sender_id: r.last_sender_id!,
+          type: r.last_type ?? "text",
+          body: r.last_body,
+          media_url: r.last_media_url,
+          media_meta: {},
+          reply_to: null,
+          pinned: false,
+          edited_at: null,
+          deleted_at: r.last_deleted_at,
+          created_at: r.last_created_at!,
+        } satisfies Message)
+      : null,
+  }));
 }
 
 export async function getConversation(id: string, me: string) {
