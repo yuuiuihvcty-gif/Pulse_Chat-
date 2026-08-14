@@ -10,7 +10,9 @@ import type {
   UserSettings,
 } from "@/lib/types";
 
-const PROFILE_COLS = "id,username,display_name,avatar_url,about,phone,mood,is_online,last_seen";
+// `phone` is deliberately absent: the database only grants other users the
+// columns below. Your own phone number comes back from `my_profile()`.
+const PROFILE_COLS = "id,username,display_name,avatar_url,about,mood,is_online,last_seen";
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
