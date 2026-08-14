@@ -29,16 +29,28 @@ export async function getProfilesByIds(ids: string[]): Promise<Profile[]> {
 }
 
 export async function getProfile(id: string) {
-
   return unwrap(
     await supabase.from("profiles").select(PROFILE_COLS).eq("id", id).maybeSingle(),
   ) as Profile | null;
 }
 
+/** Your own profile, including the private fields other users can't read. */
+export async function getMyProfile(): Promise<Profile | null> {
+  const { data, error } = await supabase.rpc("my_profile");
+  if (error) throw new Error(error.message);
+  return (data as Profile | null) ?? null;
+}
+
 export async function updateProfile(id: string, patch: Partial<Profile>) {
-  return unwrap(
-    await supabase.from("profiles").update(patch).eq("id", id).select(PROFILE_COLS).single(),
-  ) as Profile;
+  unwrap(await supabase.from("profiles").update(patch).eq("id", id).select("id").single());
+  return (await getMyProfile())!;
+}
+
+export async function isUsernameAvailable(username: string, me: string) {
+  const rows = (unwrap(
+    await supabase.from("profiles").select("id").eq("username", username).limit(1),
+  ) ?? []) as Array<{ id: string }>;
+  return rows.length === 0 || rows[0]!.id === me;
 }
 
 export async function getSettings(userId: string) {
