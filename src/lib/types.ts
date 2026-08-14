@@ -4,7 +4,8 @@ export type Profile = {
   display_name: string;
   avatar_url: string | null;
   about: string | null;
-  phone: string | null;
+  /** Only present on your own profile (other users can't read phone numbers). */
+  phone?: string | null;
   mood: string | null;
   is_online: boolean;
   last_seen: string;

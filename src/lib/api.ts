@@ -10,7 +10,9 @@ import type {
   UserSettings,
 } from "@/lib/types";
 
-const PROFILE_COLS = "id,username,display_name,avatar_url,about,phone,mood,is_online,last_seen";
+// `phone` is deliberately absent: the database only grants other users the
+// columns below. Your own phone number comes back from `my_profile()`.
+const PROFILE_COLS = "id,username,display_name,avatar_url,about,mood,is_online,last_seen";
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
@@ -27,16 +29,28 @@ export async function getProfilesByIds(ids: string[]): Promise<Profile[]> {
 }
 
 export async function getProfile(id: string) {
-
   return unwrap(
     await supabase.from("profiles").select(PROFILE_COLS).eq("id", id).maybeSingle(),
   ) as Profile | null;
 }
 
+/** Your own profile, including the private fields other users can't read. */
+export async function getMyProfile(): Promise<Profile | null> {
+  const { data, error } = await supabase.rpc("my_profile");
+  if (error) throw new Error(error.message);
+  return (data as Profile | null) ?? null;
+}
+
 export async function updateProfile(id: string, patch: Partial<Profile>) {
-  return unwrap(
-    await supabase.from("profiles").update(patch).eq("id", id).select(PROFILE_COLS).single(),
-  ) as Profile;
+  unwrap(await supabase.from("profiles").update(patch).eq("id", id).select("id").single());
+  return (await getMyProfile())!;
+}
+
+export async function isUsernameAvailable(username: string, me: string) {
+  const rows = (unwrap(
+    await supabase.from("profiles").select("id").eq("username", username).limit(1),
+  ) ?? []) as Array<{ id: string }>;
+  return rows.length === 0 || rows[0]!.id === me;
 }
 
 export async function getSettings(userId: string) {
@@ -62,84 +76,67 @@ export async function updateSettings(userId: string, patch: Partial<UserSettings
 
 /* ---------------- conversations ---------------- */
 
-export async function listConversations(me: string): Promise<ConversationSummary[]> {
-  const rows = unwrap(
-    await supabase
-      .from("conversation_members")
-      .select("conversation_id,muted,last_read_at,conversations(*)")
-      .eq("user_id", me),
-  ) as Array<{
-    conversation_id: string;
-    muted: boolean;
-    last_read_at: string;
-    conversations: {
-      id: string;
-      is_group: boolean;
-      name: string | null;
-      avatar_url: string | null;
-      last_message_at: string;
-    } | null;
-  }>;
+type OverviewRow = {
+  id: string;
+  is_group: boolean;
+  name: string | null;
+  avatar_url: string | null;
+  last_message_at: string;
+  muted: boolean;
+  last_read_at: string;
+  unread: number;
+  other_id: string | null;
+  last_message_id: string | null;
+  last_sender_id: string | null;
+  last_type: MessageType | null;
+  last_body: string | null;
+  last_media_url: string | null;
+  last_deleted_at: string | null;
+  last_created_at: string | null;
+};
 
-  const ids = rows.map((r) => r.conversation_id);
-  if (ids.length === 0) return [];
+/**
+ * One database round-trip: every conversation with its last message and unread
+ * count computed server-side (no more downloading hundreds of messages).
+ */
+export async function listConversations(_me: string): Promise<ConversationSummary[]> {
+  const { data, error } = await supabase.rpc("conversation_overview");
+  if (error) throw new Error(error.message);
+  const rows = (data ?? []) as OverviewRow[];
+  if (rows.length === 0) return [];
 
-  const [others, messages] = await Promise.all([
-    supabase
-      .from("conversation_members")
-      .select("conversation_id,user_id")
-      .in("conversation_id", ids)
-      .neq("user_id", me),
-    supabase
-      .from("messages")
-      .select("*")
-      .in("conversation_id", ids)
-      .order("created_at", { ascending: false })
-      .limit(600),
-  ]);
+  const profiles = await getProfilesByIds(
+    rows.map((r) => r.other_id).filter((v): v is string => !!v),
+  );
+  const byId = new Map(profiles.map((p) => [p.id, p]));
 
-  const otherRows = (unwrap(others) ?? []) as Array<{
-    conversation_id: string;
-    user_id: string;
-  }>;
-  const msgRows = (unwrap(messages) ?? []) as Message[];
-  const profiles = await getProfilesByIds(otherRows.map((r) => r.user_id));
-  const profileById = new Map(profiles.map((p) => [p.id, p]));
-
-  const otherByConv = new Map<string, Profile>();
-  otherRows.forEach((r) => {
-    const p = profileById.get(r.user_id);
-    if (p && !otherByConv.has(r.conversation_id)) otherByConv.set(r.conversation_id, p);
-  });
-
-
-  const lastByConv = new Map<string, Message>();
-  const unreadByConv = new Map<string, number>();
-  const lastReadByConv = new Map(rows.map((r) => [r.conversation_id, r.last_read_at]));
-
-  msgRows.forEach((m) => {
-    if (!lastByConv.has(m.conversation_id)) lastByConv.set(m.conversation_id, m);
-    const lastRead = lastReadByConv.get(m.conversation_id);
-    if (m.sender_id !== me && lastRead && new Date(m.created_at) > new Date(lastRead)) {
-      unreadByConv.set(m.conversation_id, (unreadByConv.get(m.conversation_id) ?? 0) + 1);
-    }
-  });
-
-  return rows
-    .filter((r) => r.conversations)
-    .map((r) => ({
-      id: r.conversation_id,
-      is_group: r.conversations!.is_group,
-      name: r.conversations!.name,
-      avatar_url: r.conversations!.avatar_url,
-      last_message_at: r.conversations!.last_message_at,
-      muted: r.muted,
-      last_read_at: r.last_read_at,
-      unread: unreadByConv.get(r.conversation_id) ?? 0,
-      other: otherByConv.get(r.conversation_id) ?? null,
-      lastMessage: lastByConv.get(r.conversation_id) ?? null,
-    }))
-    .sort((a, b) => +new Date(b.last_message_at) - +new Date(a.last_message_at));
+  return rows.map((r) => ({
+    id: r.id,
+    is_group: r.is_group,
+    name: r.name,
+    avatar_url: r.avatar_url,
+    last_message_at: r.last_message_at,
+    muted: r.muted,
+    last_read_at: r.last_read_at,
+    unread: r.unread,
+    other: r.other_id ? (byId.get(r.other_id) ?? null) : null,
+    lastMessage: r.last_message_id
+      ? ({
+          id: r.last_message_id,
+          conversation_id: r.id,
+          sender_id: r.last_sender_id!,
+          type: r.last_type ?? "text",
+          body: r.last_body,
+          media_url: r.last_media_url,
+          media_meta: {},
+          reply_to: null,
+          pinned: false,
+          edited_at: null,
+          deleted_at: r.last_deleted_at,
+          created_at: r.last_created_at!,
+        } satisfies Message)
+      : null,
+  }));
 }
 
 export async function getConversation(id: string, me: string) {
@@ -560,12 +557,124 @@ export async function logCall(input: {
   );
 }
 
+export async function updateCall(
+  id: string,
+  patch: Partial<{
+    status: "missed" | "answered" | "declined";
+    duration_seconds: number;
+    started_at: string | null;
+    ended_at: string | null;
+  }>,
+) {
+  unwrap(await supabase.from("calls").update(patch).eq("id", id).select("id").single());
+}
+
+export async function createCall(input: {
+  callerId: string;
+  calleeId: string;
+  type: "voice" | "video";
+  conversationId?: string | null;
+}) {
+  return unwrap(
+    await supabase
+      .from("calls")
+      .insert({
+        caller_id: input.callerId,
+        callee_id: input.calleeId,
+        type: input.type,
+        status: "missed",
+        conversation_id: input.conversationId ?? null,
+      })
+      .select("id,caller_id,callee_id,type,status,duration_seconds,created_at")
+      .single(),
+  ) as CallRecord;
+}
+
+/** WebRTC signalling: offers, answers and ICE candidates for one call. */
+export async function sendCallSignal(input: {
+  callId: string;
+  senderId: string;
+  kind: "offer" | "answer" | "candidate" | "hangup";
+  payload: Record<string, unknown>;
+}) {
+  unwrap(
+    await supabase
+      .from("call_signals")
+      .insert({
+        call_id: input.callId,
+        sender_id: input.senderId,
+        kind: input.kind,
+        payload: input.payload as never,
+      })
+      .select("id"),
+  );
+}
+
+/* ---------------- reports ---------------- */
+
+export async function reportUser(input: {
+  reporterId: string;
+  reportedId: string;
+  reason: string;
+  details?: string | null;
+  messageId?: string | null;
+  conversationId?: string | null;
+}) {
+  unwrap(
+    await supabase
+      .from("reports")
+      .insert({
+        reporter_id: input.reporterId,
+        reported_id: input.reportedId,
+        reason: input.reason,
+        details: input.details ?? null,
+        message_id: input.messageId ?? null,
+        conversation_id: input.conversationId ?? null,
+      })
+      .select("id"),
+  );
+}
+
+/* ---------------- forwarding ---------------- */
+
+export async function forwardMessage(input: {
+  message: Message;
+  senderId: string;
+  conversationIds: string[];
+}) {
+  if (input.conversationIds.length === 0) return;
+  unwrap(
+    await supabase
+      .from("messages")
+      .insert(
+        input.conversationIds.map((conversation_id) => ({
+          conversation_id,
+          sender_id: input.senderId,
+          type: input.message.type,
+          body: input.message.body,
+          media_url: input.message.media_url,
+          media_meta: { ...input.message.media_meta, forwarded: true } as never,
+        })),
+      )
+      .select("id"),
+  );
+}
+
 /* ---------------- global search ---------------- */
 
-export async function globalSearch(term: string, me: string) {
+export type GlobalSearchResult = {
+  people: Profile[];
+  messages: Message[];
+  media: Message[];
+  conversations: ConversationSummary[];
+};
+
+export async function globalSearch(term: string, me: string): Promise<GlobalSearchResult> {
   const t = term.trim();
-  if (t.length < 2) return { people: [] as Profile[], messages: [] as Message[] };
-  const [people, messages] = await Promise.all([
+  const empty: GlobalSearchResult = { people: [], messages: [], media: [], conversations: [] };
+  if (t.length < 2) return empty;
+
+  const [people, textRes, mediaRes, conversations] = await Promise.all([
     searchProfiles(t, me),
     supabase
       .from("messages")
@@ -574,6 +683,35 @@ export async function globalSearch(term: string, me: string) {
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(30),
+    supabase
+      .from("messages")
+      .select("*")
+      .in("type", ["image", "video", "file", "voice"])
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(60),
+    listConversations(me),
   ]);
-  return { people, messages: (unwrap(messages) ?? []) as Message[] };
+
+  const lower = t.toLowerCase();
+  const media = ((unwrap(mediaRes) ?? []) as Message[]).filter((m) => {
+    const meta = m.media_meta as { name?: string };
+    return (
+      (meta?.name ?? "").toLowerCase().includes(lower) ||
+      (m.body ?? "").toLowerCase().includes(lower)
+    );
+  });
+
+  return {
+    people,
+    messages: (unwrap(textRes) ?? []) as Message[],
+    media,
+    conversations: conversations.filter((c) => {
+      const label = c.is_group ? (c.name ?? "") : (c.other?.display_name ?? "");
+      return (
+        label.toLowerCase().includes(lower) ||
+        (c.other?.username ?? "").toLowerCase().includes(lower)
+      );
+    }),
+  };
 }

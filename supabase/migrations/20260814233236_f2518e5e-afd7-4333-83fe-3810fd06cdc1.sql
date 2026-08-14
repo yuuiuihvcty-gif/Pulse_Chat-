@@ -1,0 +1,17 @@
+REVOKE EXECUTE ON FUNCTION public.bump_conversation() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.touch_updated_at() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.can_see_message(uuid, uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_member(uuid, uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.owns_conversation(uuid, uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_call_party(uuid, uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.my_profile() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.conversation_overview() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_or_create_direct_conversation(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.can_see_message(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_member(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.owns_conversation(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_call_party(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.my_profile() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.conversation_overview() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_or_create_direct_conversation(uuid) TO authenticated;

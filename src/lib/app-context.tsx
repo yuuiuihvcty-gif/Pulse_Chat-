@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getProfile, getSettings, updateSettings } from "@/lib/api";
+import { getMyProfile, getSettings, updateSettings } from "@/lib/api";
 import type { Profile, UserSettings } from "@/lib/types";
 import { usePresenceHeartbeat } from "@/hooks/use-presence";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +24,7 @@ export function AppDataProvider({ user, children }: { user: User; children: Reac
 
   const profileQuery = useQuery({
     queryKey: ["profile", user.id],
-    queryFn: () => getProfile(user.id),
+    queryFn: () => getMyProfile(),
     retry: 1,
   });
 
