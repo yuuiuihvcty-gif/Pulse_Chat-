@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getProfile, getSettings, updateSettings } from "@/lib/api";
+import { getMyProfile, getSettings, updateSettings } from "@/lib/api";
 import type { Profile, UserSettings } from "@/lib/types";
 import { usePresenceHeartbeat } from "@/hooks/use-presence";
 import { supabase } from "@/integrations/supabase/client";
