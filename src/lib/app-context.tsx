@@ -24,7 +24,7 @@ export function AppDataProvider({ user, children }: { user: User; children: Reac
 
   const profileQuery = useQuery({
     queryKey: ["profile", user.id],
-    queryFn: () => getProfile(user.id),
+    queryFn: () => getMyProfile(),
     retry: 1,
   });
 
